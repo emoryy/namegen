@@ -23,7 +23,7 @@ uv sync --quiet
 (cd node && npm ci --silent)
 NLTK_DATA="$REPO/data/nltk" uv run python -c "
 import nltk
-for p in ['wordnet', 'averaged_perceptron_tagger_eng', 'cmudict']:
+for p in ['wordnet', 'averaged_perceptron_tagger', 'averaged_perceptron_tagger_eng', 'cmudict']:
     nltk.download(p, download_dir='data/nltk', quiet=True)
 "
 
