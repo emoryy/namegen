@@ -1,0 +1,7 @@
+description = "Finnish and Estonian village shapes, filtered to what an English voice can read"
+projects = ["ASMR-experiment"]
+engine = "markov"
+corpus = "finnic.txt"
+order = 3
+min_len = 4
+max_len = 9

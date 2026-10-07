@@ -1,0 +1,8 @@
+description = "Real but rare words from weaving, needlework, hand tools and farm machines (HALLOW's patched-up craft register)"
+projects = ["moons-of-september"]
+engine = "lexicon"
+roots = ["fabric.n.01", "needlework.n.01", "textile_machine.n.01", "thread.n.01", "hand_tool.n.01", "farm_machine.n.01", "cord.n.01"]
+zipf_min = 1.0
+zipf_max = 3.8
+min_len = 4
+max_len = 11

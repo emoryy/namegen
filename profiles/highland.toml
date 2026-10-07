@@ -1,0 +1,7 @@
+description = "Anglicised Scottish Gaelic places: Dal-, Kin-, Strath-, -ish, -more"
+projects = ["ASMR-experiment"]
+engine = "markov"
+corpus = "highlands.txt"
+order = 3
+min_len = 4
+max_len = 10

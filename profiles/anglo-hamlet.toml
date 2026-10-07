@@ -1,0 +1,7 @@
+description = "Quiet English village names, new but familiar (closest to Hollin / Pell)"
+projects = ["ASMR-experiment"]
+engine = "markov"
+corpus = "england-hamlets.txt"
+order = 3
+min_len = 4
+max_len = 9

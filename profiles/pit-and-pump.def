@@ -1,0 +1,8 @@
+C = t k d b g r s m n p l h w f
+O = br dr gr kr tr st sk sl bl cl
+V = a:4 o:4 u:3 i:2 e:2
+F = ck:4 rk:3 nt:2 st:3 t:3 g:2 d:2 n:2 m:1 rn:2 ft:1 sk:1 ld:1 p:1
+$S = CVF
+words: $S:5 OVF:3 CVCVF:2 OVCVF:1 $S$S:1
+reject: (.)\1\1 ckck ^h[^aeiou] ww hh
+filter: ckc > ck; ckd > gd; ckb > b

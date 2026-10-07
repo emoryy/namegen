@@ -1,0 +1,5 @@
+description = "Hard, clipped mining-camp names: stops, -ck, -rk, -st codas"
+projects = ["ASMR-experiment"]
+engine = "lexifer"
+min_len = 3
+max_len = 8

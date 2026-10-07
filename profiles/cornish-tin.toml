@@ -1,0 +1,7 @@
+description = "Cornish tin-mining country: Tre-, Pol-, Pen-, -ack, -ow; hard and old"
+projects = ["ASMR-experiment"]
+engine = "markov"
+corpus = "cornwall.txt"
+order = 3
+min_len = 4
+max_len = 10

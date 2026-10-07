@@ -1,0 +1,14 @@
+# Regexes (case-insensitive) for stems LLMs keep returning to.
+^veyl
+^veyr
+^holl(in|ow|is)
+^elar
+^kael
+^lyr(a|ia|is)
+^th?ess?al
+^halcy
+^seraph
+^aeth
+^lumin
+^lantern
+^kestrel

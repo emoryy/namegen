@@ -1,0 +1,7 @@
+description = "Flat, wet East Anglian names: -by, -ham, -thorpe, -wick"
+projects = ["ASMR-experiment"]
+engine = "markov"
+corpus = "fenland.txt"
+order = 3
+min_len = 4
+max_len = 10

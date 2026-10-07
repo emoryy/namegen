@@ -1,0 +1,7 @@
+description = "Anglicised Irish townlands: Bally-, Clon-, Kil-, -een, -agh"
+projects = ["ASMR-experiment"]
+engine = "markov"
+corpus = "ireland.txt"
+order = 3
+min_len = 4
+max_len = 10

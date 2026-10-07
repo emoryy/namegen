@@ -1,0 +1,5 @@
+description = "Latinate pseudo-words in the register of Tessellate / Cadence / Vellum: learned, technical, elegiac"
+projects = ["moons-of-september"]
+engine = "lexifer"
+min_len = 5
+max_len = 11

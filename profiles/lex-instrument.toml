@@ -1,0 +1,8 @@
+description = "Real but rare names of measuring, optical and timekeeping instruments"
+projects = ["moons-of-september"]
+engine = "lexicon"
+roots = ["measuring_instrument.n.01", "optical_instrument.n.01", "timepiece.n.01", "navigational_instrument.n.01"]
+zipf_min = 0.8
+zipf_max = 3.6
+min_len = 5
+max_len = 12

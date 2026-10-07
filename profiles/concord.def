@@ -1,0 +1,7 @@
+C = c:4 t:4 r:3 l:4 s:3 v:2 p:3 m:3 n:3 d:2 f:1 g:1 b:1 qu:1 h:1
+J = l:4 ss:3 rr:2 nt:3 nc:2 st:2 ct:2 rt:2 mp:2 ll:3 d:2 v:2 n:3 r:3 t:3 c:2 s:2 m:2
+O = pr cr tr pl cl fl st sp gr
+V = a:4 e:4 i:3 o:3 u:1
+E = ance:3 ence:3 ory:2 ade:2 ium:1 um:2 ell:2 et:2 or:2 ion:2 ate:2 ude:1 ary:2 ine:2 ure:1 ent:2 ix:1 is:1
+words: CVJE:4 CVCVJE:4 OVJE:2 VJE:1 VCVJE:1 OVCVJE:1
+reject: (..+)\1 [aeiou]{3} quu ([aeiou])\1

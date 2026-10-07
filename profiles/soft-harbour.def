@@ -1,0 +1,7 @@
+C = m n l s t d v h b r w f
+D = l n s m r v th
+V = a:5 o:4 e:3 i:3 u:1
+F = n:4 s:3 l:2 m:1 th:1
+E = a:3 e:2 o:2 en:3 is:2 an:2 ey:1 ow:2 in:2
+words: CVDE:5 CVCVDE:3 VDE:1 CVFCE:2 CVF:2 CVDVF:2
+reject: (..+)\1 ^h[^aeiou] [aeiou]{3} ([aeiou])\1

@@ -1,0 +1,5 @@
+description = "Open, unhurried names for a gentle trading people: light codas, l/m/n/s, two to three syllables"
+projects = ["ASMR-experiment"]
+engine = "lexifer"
+min_len = 4
+max_len = 9

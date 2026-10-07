@@ -1,0 +1,8 @@
+description = "Real but rare words from geology, excavation, sediments and watercourses (the Silt's earth-moving register)"
+projects = ["moons-of-september"]
+engine = "lexicon"
+roots = ["excavation.n.03", "geological_formation.n.01", "sediment.n.01", "rock.n.01", "body_of_water.n.01", "ditch.n.01", "embankment.n.01", "building_material.n.01", "geology.n.01"]
+zipf_min = 1.0
+zipf_max = 3.8
+min_len = 4
+max_len = 11

@@ -1,0 +1,9 @@
+description = "Survey-catalogue designations for stars, planets and moons, e.g. 'Hurstown 418 c' (survey name from anglo-hamlet)"
+projects = ["ASMR-experiment"]
+engine = "template"
+case = "keep"
+patterns = ["{survey} {num:2-999}", "{survey} {num:2-999} {letter}", "{survey}-{num:100-9999}{letter}", "{survey} {num:2-99} {roman}"]
+[slots]
+survey = { profile = "anglo-hamlet" }
+letter = ["b", "c", "d", "e", "f"]
+roman = ["I", "II", "III", "IV", "V", "VI", "VII"]

@@ -1,0 +1,17 @@
+description = "Maintenance-network acronyms with an expansion, like SILT = Surface Integrity and Lifecycle Tending"
+projects = ["moons-of-september"]
+engine = "backronym"
+acronyms = "lex-acronym"
+shapes = [
+  "qualifier object and qualifier action",
+  "qualifier object action",
+  "qualifier qualifier object action",
+  "object and qualifier action",
+  "qualifier object and object action",
+  "qualifier qualifier object and qualifier action",
+  "qualifier object action",
+]
+[vocab]
+qualifier = "data/vocab/maint-qualifier.txt"
+object = "data/vocab/maint-object.txt"
+action = "data/vocab/maint-action.txt"

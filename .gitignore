@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+node/node_modules/
+data/raw/
+data/nltk/
+data/cache/

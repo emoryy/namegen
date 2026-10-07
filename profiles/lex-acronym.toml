@@ -1,0 +1,9 @@
+description = "Short real words (4 to 5 letters) from earth, material and fibre fields, used as acronyms by backronym profiles"
+projects = ["moons-of-september"]
+engine = "lexicon"
+roots = ["sediment.n.01", "rock.n.01", "material.n.01", "fabric.n.01", "cord.n.01", "geological_formation.n.01", "hand_tool.n.01"]
+primary_sense = false
+zipf_min = 2.0
+zipf_max = 4.8
+min_len = 4
+max_len = 5

@@ -1,0 +1,9 @@
+description = "Function-and-number names for maintenance centres, e.g. 'SILT / SURFACE CONTROL 17'"
+projects = ["moons-of-september"]
+engine = "template"
+case = "keep"
+patterns = ["{org} / {area} {duty} {num:01-99}", "{org} / {duty} {num:01-99}"]
+[slots]
+org = ["SILT"]
+area = { file = "data/vocab/designation-area.txt" }
+duty = { file = "data/vocab/designation-duty.txt" }
