@@ -2,20 +2,36 @@
 
 Procedural name candidates for worldbuilding, so that an LLM **curates** names instead of inventing them. LLMs collapse onto a handful of names (Elara, Elias, Pell, Veyl, Lantern...); here the randomness comes from corpora, phonology rules and WordNet, and the model only picks from the list.
 
+## Install
+
+```bash
+git clone git@github.com:emoryy/namegen.git && cd namegen && ./install.sh
+```
+
+Needs `uv` and `node`. `install.sh` sets up the Python and Node dependencies and the NLTK data, links `~/.local/bin/namegen`, and links the Claude Code skill into `${CLAUDE_CONFIG_DIR:-~/.claude}/skills/namegen`. It is safe to re-run after a `git pull`.
+
 ## Usage
 
 ```bash
-bin/namegen profiles                              # list profiles
-bin/namegen gen anglo-hamlet -n 100               # candidates (random seed, printed in the header)
-bin/namegen gen lex-learned -n 60 --seed 42       # reproducible
-bin/namegen gen concord --starts-with ca --max-len 8
-bin/namegen check Veyra Hollin                    # pronunciation, sound-alikes, attractor and usage checks
-bin/namegen claim Brask --profile pit-and-pump --role "mining moon" --note "..."
-bin/namegen avoid Veyra Hollin Pell               # never offer these in this project
-bin/namegen used                                  # claimed and avoided names
+namegen context                               # project naming notes, claimed and avoided names
+namegen profiles                              # list profiles
+namegen gen anglo-hamlet -n 100               # candidates (random seed, printed in the header)
+namegen gen lex-learned -n 60 --seed 42       # reproducible
+namegen gen concord --starts-with ca --max-len 8
+namegen check Veyra Hollin                    # pronunciation, sound-alikes, attractor and usage checks
+namegen claim Brask --profile pit-and-pump --role "mining moon" --note "..."
+namegen avoid Veyra Hollin Pell               # never offer these in this project
+namegen used                                  # claimed and avoided names
 ```
 
-`--project DIR` selects the project (default: the git root of the current directory). Per-project state lives in `<project>/.namegen/`: `used.json`, `avoid.txt` and optional project profiles in `profiles/*.toml` (these override global ones with the same name).
+`--project DIR` selects the project (default: the git root of the current directory). Per-project state lives in `<project>/.namegen/`:
+
+| File | What |
+|---|---|
+| `NOTES.md` | Naming rules of this world (medium, register, constraints); the skill reads it first |
+| `used.json` | Claimed names with role, profile and note |
+| `avoid.txt` | Names never to offer: existing ones and rejected ones |
+| `profiles/*.toml` | Project profiles; they override global ones with the same name |
 
 ## Engines
 
@@ -62,16 +78,14 @@ max_zipf = 2.5
 
 A `lexifer` profile reads `<profile>.def` next to the `.toml`. See `profiles/` for template and backronym examples.
 
-## Setup
+## Rebuilding data
 
-```bash
-scripts/setup.sh
-```
-
-Needs `uv` and `node`. Corpora are rebuilt with `scripts/build_corpora.py` (instructions inside).
+- Corpora: `scripts/build_corpora.py` (download instructions inside).
+- Attractor list: `scripts/build_attractors.py <dir with naming-experiment JSONs>`.
 
 ## Data and licences
 
 - Place-name corpora: [GeoNames](https://www.geonames.org) (CC-BY 4.0).
 - WordNet 3.0 (Princeton WordNet licence) via NLTK; CMUdict (BSD); `wordfreq` (Apache-2.0 code, CC-BY-SA data).
 - Lexifer TS and markov-namegen: MIT.
+- namegen itself: MIT, see `LICENSE`.

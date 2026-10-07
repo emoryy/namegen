@@ -1,4 +1,4 @@
-"""Per-project state in <project>/.namegen/: used.json (claimed names) and avoid.txt (names to never propose)."""
+"""Per-project state in <project>/.namegen/: used.json (claimed names), avoid.txt (never propose) and NOTES.md (naming rules)."""
 
 import datetime
 import json
@@ -10,6 +10,10 @@ class ProjectStore:
         self.dir = root / ".namegen"
         self.used_path = self.dir / "used.json"
         self.avoid_path = self.dir / "avoid.txt"
+        self.notes_path = self.dir / "NOTES.md"
+
+    def notes(self):
+        return self.notes_path.read_text(encoding="utf-8") if self.notes_path.exists() else None
 
     def used(self):
         if not self.used_path.exists():

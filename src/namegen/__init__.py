@@ -77,6 +77,16 @@ def cmd_used(args):
         print(f"# avoid list: {', '.join(avoid)}")
 
 
+def cmd_context(args):
+    root = paths.project_root(args.project)
+    store = ProjectStore(root)
+    print(f"# project: {root}")
+    notes = store.notes()
+    print(notes.rstrip() if notes else f"# no naming notes yet ({store.notes_path})")
+    print()
+    cmd_used(args)
+
+
 def cmd_profiles(args):
     root = paths.project_root(args.project)
     for name, p in sorted(load_all(root).items()):
@@ -115,6 +125,7 @@ def main():
     av.set_defaults(func=cmd_avoid)
 
     sub.add_parser("used", help="list claimed and avoided names").set_defaults(func=cmd_used)
+    sub.add_parser("context", help="project naming notes plus claimed and avoided names").set_defaults(func=cmd_context)
     sub.add_parser("profiles", help="list profiles").set_defaults(func=cmd_profiles)
 
     args = ap.parse_args()

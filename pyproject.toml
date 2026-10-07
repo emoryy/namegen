@@ -1,7 +1,7 @@
 [project]
 name = "namegen"
 version = "0.1.0"
-description = "Add your description here"
+description = "Procedural name candidates for worldbuilding, curated by an LLM instead of invented by it"
 readme = "README.md"
 authors = [
     { name = "Barta Gábor", email = "emoryy@gmail.com" }
