@@ -36,24 +36,24 @@ namegen used                                  # claimed and avoided names
 
 ## Example session
 
-A cold archipelago colony, named from scratch. All output below is real and reproducible with the given seed in a fresh project. Edits are cosmetic only: the project path is shortened, long glosses and repeated `check` lines are cut to `...`, and the two `goon` lists are printed on one line.
+A cold archipelago colony, named from scratch. All output below is real and reproducible with the given seed in a fresh project. Edits are cosmetic only: the project path is shortened, long glosses and repeated `check` lines are cut to `...`, and the two `bra` lists are printed on one line without their `sounds like` notes.
 
 ### One slot, several registers
 
 Settler towns could sound Cornish, Highland or Finnish. Generating a short list from each lets the user hear the difference before choosing a register:
 
 ```console
-$ namegen gen cornish-tin -n 8 --seed 2026
-# cornish-tin (markov), seed 2026, project ~/worlds/demo
-# 8 candidates from 64 raw; rejected: real place in a corpus 4, not English-pronounceable 1, rude 1, real English word 1
-Muchleven
-Maypolper
-Goonhall
-Scavern
-Blagate
-Porthy   (sounds like: dorothy)
-Castcot
-Triscoe
+$ namegen gen cornish-tin -n 8 --seed 2027
+# cornish-tin (markov), seed 2027, project ~/worlds/demo
+# 8 candidates from 64 raw; rejected: real place in a corpus 3, real English word 2, not English-pronounceable 1
+Braddam
+Woodacombe
+Trencuke
+Mevarah
+Crosenford
+Ennick   (sounds like: nick, eric, epic)
+Sladra
+Angoland
 
 $ namegen gen highland -n 8 --seed 2026
 # highland (markov), seed 2026, project ~/worlds/demo
@@ -197,13 +197,13 @@ The model never writes a name of its own. It reads the project notes, generates 
 
 | Candidate | Profile | Why |
 |---|---|---|
-| Goonhall | cornish-tin | Cornish *goon* (downs) + *hall*; two plain syllables, no sound-alikes |
-| Scavern | cornish-tin | hard and old, close to *cavern* without being the word |
+| Braddam | cornish-tin | two plain syllables, no sound-alikes, reads like an old harbour |
+| Crosenford | cornish-tin | an English *-ford* shape that is not a real place |
 | Ardvasgo | highland | long and stately, reads unambiguously |
 | Taiskula | finnic | clearly foreign, still easy for an English voice |
 | Rilmen | soft-harbour | if the town should belong to the islanders instead of the settlers |
 
-Allowed edits are adding a generic word (`Goonhall Quay`) or a one-letter spelling change that is re-checked. Blending two candidates or "improving" one into a new name is not.
+Allowed edits are adding a generic word (`Braddam Quay`) or a one-letter spelling change that is re-checked. Blending two candidates or "improving" one into a new name is not.
 
 ### Project memory
 
@@ -213,11 +213,11 @@ Claimed and avoided names shape every later run:
 $ namegen avoid Hollin Pell
 added 2 name(s) to ~/worlds/demo/.namegen/avoid.txt
 
-$ namegen claim Goonhall --profile cornish-tin --role "harbour town" --note "Cornish goon- (downs) shape, no sound-alikes"
-claimed Goonhall as harbour town in ~/worlds/demo/.namegen/used.json
+$ namegen claim Braddam --profile cornish-tin --role "harbour town" --note "two plain syllables, no sound-alikes"
+claimed Braddam as harbour town in ~/worlds/demo/.namegen/used.json
 
-$ namegen claim Goonhal --profile cornish-tin --role "second town"
-not claimed: Goonhal: sounds like project name(s): Goonhall (pass --force to claim anyway)
+$ namegen claim Braddon --profile cornish-tin --role "second town"
+not claimed: Braddon: sounds like project name(s): Braddam (pass --force to claim anyway)
 
 $ namegen claim Elara --profile manual --role "a moon"
 not claimed: Elara: attractor 'elara' (pass --force to claim anyway)
@@ -226,22 +226,22 @@ $ namegen claim Kestrel --profile nonsense --role "a ship"
 unknown profile: nonsense (see `namegen profiles`; use --profile manual for a name that did not come from namegen)
 ```
 
-After the claim, generation drops names too close to `Goonhall`. The same seed in an empty project and in this one:
+After the claim, generation drops names too close to `Braddam`. The same seed in an empty project and in this one:
 
 ```console
-$ namegen gen cornish-tin -n 8 --starts-with goon --seed 1     # empty project
-# 8 candidates from 64 raw; rejected: real place in a corpus 2, real English word 1, not English-pronounceable 1
-Goonhayle  Goonberryn  Goonamage  Goonaford  Goonhay  Goonberdon  Goonhale  Goonamarth
+$ namegen gen cornish-tin -n 8 --starts-with bra --seed 2     # empty project
+# 8 candidates from 64 raw; rejected: real place in a corpus 2, real English word 1, homophone of a common word 1
+Braddon  Brazion  Bradworgan  Bradston  Braze  Brancott  Braddoc  Bradstock
 
-$ namegen gen cornish-tin -n 8 --starts-with goon --seed 1     # after claiming Goonhall
-# 8 candidates from 64 raw; rejected: real place in a corpus 2, real English word 1, not English-pronounceable 1, sounds like a project name 1
-Goonhayle  Goonberryn  Goonamage  Goonaford  Goonhay  Goonberdon  Goonamarth  Goonhalga
+$ namegen gen cornish-tin -n 8 --starts-with bra --seed 2     # after claiming Braddam
+# 8 candidates from 64 raw; rejected: real place in a corpus 3, sounds like a project name 2, homophone of a common word 2, real English word 1
+Brazion  Bradworgan  Bradston  Braze  Brancott  Bradstock  Bradforder  Bradda
 ```
 
 `check` explains any single name:
 
 ```console
-$ namegen check Elara Goonhale Brugast
+$ namegen check Elara Braddoc Brugast
 Elara
   pronunciation: EH L AA R AH
   homophones: -; one phone away: lara
@@ -251,10 +251,10 @@ Elara
   rude: no
   used/avoided in demo: no
   sounds like a project name: no
-Goonhale
-  pronunciation: G UH N HH EY L
+Braddoc
+  pronunciation: B R AE D AH K
   ...
-  sounds like a project name: Goonhall
+  sounds like a project name: Braddam
 Brugast
   pronunciation: B R AH G AH S T
   homophones: -; one phone away: -
