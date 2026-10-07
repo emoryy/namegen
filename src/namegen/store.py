@@ -1,7 +1,11 @@
-"""Per-project state in <project>/.namegen/: used.json (claimed names), avoid.txt (never propose) and NOTES.md (naming rules)."""
+"""Per-project state in <project>/.namegen/: used.json (claimed names), avoid.txt (never propose), NOTES.md (naming
+rules) and config.toml (settings such as the languages readers of the work speak)."""
 
 import datetime
 import json
+import tomllib
+
+from .foreign import DEFAULT_LANGUAGES
 
 
 class ProjectStore:
@@ -11,9 +15,19 @@ class ProjectStore:
         self.used_path = self.dir / "used.json"
         self.avoid_path = self.dir / "avoid.txt"
         self.notes_path = self.dir / "NOTES.md"
+        self.config_path = self.dir / "config.toml"
 
     def notes(self):
         return self.notes_path.read_text(encoding="utf-8") if self.notes_path.exists() else None
+
+    def config(self):
+        if not self.config_path.exists():
+            return {}
+        return tomllib.loads(self.config_path.read_text(encoding="utf-8"))
+
+    def languages(self):
+        langs = self.config().get("languages", DEFAULT_LANGUAGES)
+        return langs if "en" in langs else ["en", *langs]
 
     def used(self):
         if not self.used_path.exists():

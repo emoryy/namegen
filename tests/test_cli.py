@@ -106,3 +106,18 @@ def test_rude_acronyms_never_come_out(cli):
     for seed in range(1, 6):
         out = cli("gen", "lex-acronym", "-n", "60", "--seed", str(seed))[1]
         assert not {"Turd", "Crap", "Piss", "Skank"} & set(names(out))
+
+
+def test_project_languages_from_config(cli, project):
+    code, out = cli("check", "Getsy")
+    assert "sounds like Hungarian 'geci'" in out
+    (project / ".namegen").mkdir(exist_ok=True)
+    (project / ".namegen" / "config.toml").write_text('languages = ["en"]\n')
+    code, out = cli("check", "Getsy")
+    assert "other languages" not in out
+    assert cli("claim", "Getsy", "--profile", "manual", "--role", "x")[0] == 0
+
+
+def test_claim_refuses_rude_in_other_language(cli):
+    code, out = cli("claim", "Getsy", "--profile", "manual", "--role", "x")
+    assert code == 1 and "Hungarian 'geci'" in out

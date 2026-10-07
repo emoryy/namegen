@@ -262,6 +262,11 @@ def pronounce(name):
     return tuple(p for p in _g2p()(name) if p.strip())
 
 
+def english_pron(word):
+    """Stress-free ARPAbet as an English reader would say the word."""
+    return _strip_stress(pronounce(word))
+
+
 def sounds_like(name):
     """Returns (pronunciation, exact homophones, near matches one phone away)."""
     exact_idx, near_idx = _sound_index()

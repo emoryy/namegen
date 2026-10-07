@@ -1,7 +1,7 @@
 import collections
 import random
 
-from . import engines, filters
+from . import engines, filters, foreign
 from .profiles import load
 
 PSEUDO = {"markov", "lexifer"}
@@ -26,6 +26,7 @@ class Generator:
         self.seed = seed
         self.rng = random.Random(seed)
         self.taken = store.taken() if store else set()
+        self.languages = store.languages() if store else foreign.DEFAULT_LANGUAGES
         self._taken_prons = None
         self.stats = {}
 
@@ -77,6 +78,8 @@ class Generator:
                 return "homophone of a common word"
             if profanity and filters.profanity_hit(name):
                 return "rude"
+            if profanity and foreign.rude_hit(name, self.languages):
+                return "rude in another language"
             if project_sound and self.taken_prons and filters.close_to_project(name, self.taken_prons):
                 return "sounds like a project name"
             return None
@@ -109,6 +112,9 @@ class Generator:
                     if near:
                         cand["sounds_like"] = near[:3]
                 cand = {k: v for k, v in cand.items() if k != "reject"}
+                plain = foreign.plain_words(name, self.languages)
+                if plain:
+                    cand["word_in"] = [foreign.language_name(l) for l in plain]
                 accepted.append({**cand, "name": name})
                 if len(accepted) >= n:
                     break

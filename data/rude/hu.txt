@@ -1,0 +1,28 @@
+# Hungarian rude words (curated from LDNOOBW, CC BY 4.0, plus additions). Base forms: words of 4+ letters also
+# match as a prefix, since Hungarian adds suffixes (kurvák, faszfej).
+balfasz
+basz
+baszd
+baszik
+bazdmeg
+bazmeg
+buzi
+csicska
+csöcs
+fasz
+fing
+geci
+kibaszott
+kúr
+kurafi
+kurva
+lófasz
+picsa
+pina
+pöcs
+punci
+ribanc
+segg
+szajha
+szar
+szop

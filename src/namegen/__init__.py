@@ -6,7 +6,7 @@ import os
 import sys
 
 from . import paths  # noqa: F401  (sets NLTK_DATA before nltk is imported)
-from . import filters
+from . import filters, foreign
 from .core import Generator
 from .profiles import load_all
 from .store import ProjectStore
@@ -20,8 +20,13 @@ def _format(c):
         parts.append(f"[zipf {c['zipf']}]")
     if "gloss" in c:
         parts.append(f": {c['gloss']}")
+    notes = []
     if c.get("sounds_like"):
-        parts.append(f"  (sounds like: {', '.join(c['sounds_like'])})")
+        notes.append(f"sounds like: {', '.join(c['sounds_like'])}")
+    if c.get("word_in"):
+        notes.append(f"{'/'.join(c['word_in'])} word")
+    if notes:
+        parts.append(f"  ({'; '.join(notes)})")
     return " ".join(parts)
 
 
@@ -47,6 +52,7 @@ def cmd_check(args):
     store = ProjectStore(root)
     taken = store.taken()
     taken_prons = filters.project_prons(store.taken_names())
+    langs = store.languages()
     for name in args.names:
         key = name.lower()
         pron, exact, near = filters.sounds_like(name)
@@ -57,6 +63,12 @@ def cmd_check(args):
         print(f"  real word: {filters.real_word(key, 0.0) or 'no'}")
         print(f"  LLM attractor: {filters.attractor_hit(key) or 'no'}")
         print(f"  rude: {filters.profanity_hit(name) or 'no'}")
+        other = [l for l in langs if l != "en"]
+        if other:
+            hit = foreign.rude_hit(name, langs)
+            plain = foreign.plain_words(name, langs)
+            print(f"  other languages ({', '.join(other)}): rude: {foreign.describe_rude(hit) if hit else 'no'}; "
+                  f"plain word in: {', '.join(foreign.language_name(l) for l in plain) or '-'}")
         print(f"  used/avoided in {root.name}: {'yes' if key in taken else 'no'}")
         close = [n for n in filters.close_to_project(name, taken_prons) if n.lower() != key]
         print(f"  sounds like a project name: {', '.join(close) or 'no'}")
@@ -68,6 +80,7 @@ def claim_problems(name, store):
     problems = [
         filters.attractor_hit(name) if " " not in name else None,
         filters.profanity_hit(name) and f"rude: {filters.profanity_hit(name)}",
+        (hit := foreign.rude_hit(name, store.languages())) and f"rude: {foreign.describe_rude(hit)}",
         close and f"sounds like project name(s): {', '.join(close)}",
     ]
     return [p for p in problems if p]
