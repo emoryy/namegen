@@ -302,7 +302,7 @@ $ namegen gen frost-tongue -n 8 --seed 2026
 # frost-tongue (lexifer), seed 2026, project ~/worlds/demo
 # 8 candidates from 64 raw; rejected: length 3
 Niku   (sounds like: nick, nikki, knicks)
-Jiti   (sounds like: bt, genie, gigi)
+Jiti   (sounds like: bt, genie, beatty)
 Taku   (sounds like: taco)
 Kesyr   (sounds like: lesser, keller, kessler)
 Nase   (sounds like: days, name, news)
