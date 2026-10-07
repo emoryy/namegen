@@ -48,10 +48,23 @@ def _medial_ok(c):
     return False
 
 
+ROMAN = re.compile(r"^[IVXLC]+$")
+
+
 def english_phonotactics(name):
     w = name.lower()
     if not w.isalpha():
-        return "non-letters"
+        # designations like 'Keythley 923 b' or 'Alama Holm IV': judge each word, skip numbers, letters, numerals
+        parts = [re.sub(r"\d+", "", p) for p in re.split(r"[\s\-/]+", name) if p]
+        if not all(p.isalpha() for p in parts if p):
+            return "non-letters"
+        for p in parts:
+            if len(p) <= 1 or ROMAN.match(p):
+                continue
+            problem = english_phonotactics(p)
+            if problem:
+                return f"{problem} in '{p}'"
+        return None
     if re.search(r"q(?!u)", w):
         return "q without u"
     runs = _clusters(w)
@@ -99,6 +112,75 @@ def attractor_hit(name):
         if p.search(low):
             return f"attractor pattern /{p.pattern}/"
     return None
+
+
+def words(name):
+    """Alphabetic tokens of a name, lowercased: 'Keythley 923 b' -> ['keythley', 'b']."""
+    return re.findall(r"[a-z]+", name.lower())
+
+
+PROFANITY_NEAR_MIN_PHONES = 4
+KNOWN_WORD_ZIPF = 1.5
+
+
+@functools.cache
+def _profanity():
+    stems = [s.lower() for s in _read_list(DATA / "profanity-stems.txt")]
+    whole = {w.lower() for w in _read_list(DATA / "profanity-words.txt")}
+    prons = {}
+    for w in whole:
+        for p in _prons(w):
+            prons.setdefault(_strip_stress(p), w)
+    return stems, whole, prons
+
+
+def profanity_hit(name, pron=None):
+    """Rude whole word; for invented words also a rude stem anywhere or a pronunciation equal to (or one phone
+    from) a rude word. Known English words skip the last two, so slate, crepe or wristwatch stay allowed."""
+    stems, whole, prons = _profanity()
+    low = name.lower()
+    tokens = words(name)
+    for w in tokens:
+        if w in whole:
+            return f"rude word '{w}'"
+    if tokens and all(zipf_frequency(w, "en") >= KNOWN_WORD_ZIPF for w in tokens):
+        return None
+    for s in stems:
+        if s in low:
+            return f"contains '{s}'"
+    if pron is None:
+        if not name.isalpha():
+            return None
+        pron = _strip_stress(pronounce(name))
+    if pron in prons:
+        return f"sounds like '{prons[pron]}'"
+    for p, w in prons.items():
+        if len(p) >= PROFANITY_NEAR_MIN_PHONES and _edit1(pron, p):
+            return f"sounds like '{w}'"
+    return None
+
+
+def project_prons(names):
+    """Pronunciations of a project's distinctive name words (not numbers, single letters or common words)."""
+    out = {}
+    for name in names:
+        for w in words(name):
+            if len(w) >= 3 and zipf_frequency(w, "en") < 3.0:
+                out.setdefault(_strip_stress(pronounce(w)), name)
+    return out
+
+
+def close_to_project(name, taken_prons):
+    """Project names that a word of this name matches or is one phone away from."""
+    hits = []
+    for w in words(name):
+        if len(w) < 3:
+            continue
+        pron = _strip_stress(pronounce(w))
+        for p, owner in taken_prons.items():
+            if (pron == p or _edit1(pron, p)) and owner not in hits:
+                hits.append(owner)
+    return hits
 
 
 def real_word(name, max_zipf):
@@ -175,6 +257,7 @@ def _g2p():
     return G2p()
 
 
+@functools.lru_cache(maxsize=65536)
 def pronounce(name):
     return tuple(p for p in _g2p()(name) if p.strip())
 

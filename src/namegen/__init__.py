@@ -16,6 +16,8 @@ def _format(c):
     parts = [c["name"]]
     if "expansion" in c:
         parts.append(f"= {c['expansion']}")
+    if "zipf" in c:
+        parts.append(f"[zipf {c['zipf']}]")
     if "gloss" in c:
         parts.append(f": {c['gloss']}")
     if c.get("sounds_like"):
@@ -42,22 +44,47 @@ def cmd_gen(args):
 
 def cmd_check(args):
     root = paths.project_root(args.project)
-    taken = ProjectStore(root).taken()
+    store = ProjectStore(root)
+    taken = store.taken()
+    taken_prons = filters.project_prons(store.taken_names())
     for name in args.names:
         key = name.lower()
         pron, exact, near = filters.sounds_like(name)
         print(f"{name}")
         print(f"  pronunciation: {' '.join(pron)}")
         print(f"  homophones: {', '.join(exact) or '-'}; one phone away: {', '.join(near[:8]) or '-'}")
-        print(f"  English phonotactics: {filters.english_phonotactics(key) or 'ok'}")
+        print(f"  English phonotactics: {filters.english_phonotactics(name) or 'ok'}")
         print(f"  real word: {filters.real_word(key, 0.0) or 'no'}")
         print(f"  LLM attractor: {filters.attractor_hit(key) or 'no'}")
+        print(f"  rude: {filters.profanity_hit(name) or 'no'}")
         print(f"  used/avoided in {root.name}: {'yes' if key in taken else 'no'}")
+        close = [n for n in filters.close_to_project(name, taken_prons) if n.lower() != key]
+        print(f"  sounds like a project name: {', '.join(close) or 'no'}")
+
+
+def claim_problems(name, store):
+    taken_prons = filters.project_prons(store.taken_names())
+    close = [n for n in filters.close_to_project(name, taken_prons) if n.lower() != name.lower()]
+    problems = [
+        filters.attractor_hit(name) if " " not in name else None,
+        filters.profanity_hit(name) and f"rude: {filters.profanity_hit(name)}",
+        close and f"sounds like project name(s): {', '.join(close)}",
+    ]
+    return [p for p in problems if p]
 
 
 def cmd_claim(args):
     root = paths.project_root(args.project)
-    ProjectStore(root).claim(args.name, args.profile, args.role, args.note)
+    store = ProjectStore(root)
+    if args.profile != "manual" and args.profile not in load_all(root):
+        sys.exit(f"unknown profile: {args.profile} (see `namegen profiles`; use --profile manual for a name "
+                 "that did not come from namegen)")
+    problems = claim_problems(args.name, store)
+    if problems and not args.force:
+        sys.exit(f"not claimed: {args.name}: " + "; ".join(problems) + " (pass --force to claim anyway)")
+    store.claim(args.name, args.profile, args.role, args.note)
+    for p in problems:
+        print(f"warning: {p}")
     print(f"claimed {args.name} as {args.role} in {root}/.namegen/used.json")
 
 
@@ -118,6 +145,7 @@ def main():
     cl.add_argument("--profile", required=True)
     cl.add_argument("--role", required=True, help="what the name is for, e.g. 'gas giant'")
     cl.add_argument("--note")
+    cl.add_argument("--force", action="store_true", help="claim despite attractor, rude or sound-alike warnings")
     cl.set_defaults(func=cmd_claim)
 
     av = sub.add_parser("avoid", help="add names the project must never be offered (existing or rejected)")

@@ -26,8 +26,11 @@ class ProjectStore:
         lines = self.avoid_path.read_text(encoding="utf-8").splitlines()
         return [l.strip() for l in lines if l.strip() and not l.startswith("#")]
 
+    def taken_names(self):
+        return [e["name"] for e in self.used()] + self.avoid()
+
     def taken(self):
-        return {e["name"].lower() for e in self.used()} | {n.lower() for n in self.avoid()}
+        return {n.lower() for n in self.taken_names()}
 
     def claim(self, name, profile, role, note):
         entries = self.used()

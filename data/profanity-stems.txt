@@ -1,0 +1,13 @@
+# Strong stems rejected anywhere inside a name (case-insensitive).
+cunt
+fuck
+shit
+twat
+wank
+piss
+nigg
+fagg
+jizz
+spunk
+bitch
+whore

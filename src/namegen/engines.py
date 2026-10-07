@@ -44,6 +44,7 @@ def markov(profile, n, rng, opts):
         "backoff": profile.get("backoff", True),
         "minLength": opts.get("min_len") or profile.get("min_len", 4),
         "maxLength": opts.get("max_len") or profile.get("max_len", 10),
+        "startsWith": (opts.get("starts_with") or "").lower(),
     })
     return [{"name": w} for w in raw]
 
@@ -105,7 +106,9 @@ def lexicon(profile, n, rng, opts):
     pool = lexicon_pool(profile)
     words = sorted(pool)
     rng.shuffle(words)
-    return [{"name": w, "gloss": pool[w]} for w in words]
+    from wordfreq import zipf_frequency
+
+    return [{"name": w, "gloss": pool[w], "zipf": round(zipf_frequency(w, "en"), 1)} for w in words]
 
 
 def _num(spec, rng):
@@ -126,11 +129,17 @@ def template(profile, n, rng, opts, generate):
         else:
             filled[key] = list(spec)
 
+    # deal slot values like cards, so one generated name does not fill half the list
+    decks = {}
+
     def fill(m):
         key = m.group(1)
         if key.startswith("num:"):
             return _num(key[4:], rng)
-        return rng.choice(filled[key])
+        if not decks.get(key):
+            decks[key] = filled[key][:]
+            rng.shuffle(decks[key])
+        return decks[key].pop()
 
     out = []
     for _ in range(n):
@@ -168,7 +177,9 @@ def backronym(profile, n, rng, opts, generate):
             else:
                 out.append({"name": acro, "expansion": " ".join(words)})
                 break
-        if len(out) >= n:
+        else:
+            out.append({"name": acro, "reject": "no expansion fits" if fitting else "no shape for its length"})
+        if sum(1 for c in out if "reject" not in c) >= n:
             break
     return out
 

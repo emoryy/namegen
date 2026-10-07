@@ -3,6 +3,6 @@ projects = ["moons-of-september"]
 engine = "lexicon"
 roots = ["music.n.01", "musical_composition.n.01", "astronomy.n.01", "geometry.n.01", "prosody.n.01", "timepiece.n.01", "heraldry.n.01"]
 zipf_min = 1.0
-zipf_max = 3.6
+zipf_max = 3.2
 min_len = 5
 max_len = 11

@@ -6,6 +6,7 @@ from .profiles import load
 
 PSEUDO = {"markov", "lexifer"}
 OVERGENERATE = 8
+ROUNDS = 6
 
 
 def _case(name, mode):
@@ -25,7 +26,14 @@ class Generator:
         self.seed = seed
         self.rng = random.Random(seed)
         self.taken = store.taken() if store else set()
+        self._taken_prons = None
         self.stats = {}
+
+    @property
+    def taken_prons(self):
+        if self._taken_prons is None:
+            self._taken_prons = filters.project_prons(self.store.taken_names()) if self.store else {}
+        return self._taken_prons
 
     def generate(self, profile_name, n, opts=None, top=True):
         opts = opts or {}
@@ -44,49 +52,70 @@ class Generator:
         starts = (opts.get("starts_with") or "").lower()
         case = profile.get("case", "upper" if engine == "backronym" else "title")
 
+        profanity = flt.get("profanity", True)
+        project_sound = flt.get("project_sound", True)
+
+        def reject_reason(cand, name, key):
+            core = key.replace(" ", "").replace("-", "")
+            if cand.get("reject"):
+                return cand["reject"]
+            if min_len and len(core) < min_len or max_len and len(core) > max_len:
+                return "length"
+            if starts and not key.startswith(starts):
+                return "prefix"
+            if key in self.taken:
+                return "used in project"
+            if key in corpus:
+                return "real place in a corpus"
+            if not allow_attractors and " " not in key and filters.attractor_hit(key):
+                return "LLM attractor"
+            if phonotactics and filters.english_phonotactics(name):
+                return "not English-pronounceable"
+            if max_zipf is not None and filters.real_word(key, max_zipf):
+                return "real English word"
+            if sound_check and filters.sounds_like(name)[1]:
+                return "homophone of a common word"
+            if profanity and filters.profanity_hit(name):
+                return "rude"
+            if project_sound and self.taken_prons and filters.close_to_project(name, self.taken_prons):
+                return "sounds like a project name"
+            return None
+
         sub = lambda name, k: self.generate(name, k, top=False)
-        raw = engines.run(profile, n * OVERGENERATE if pseudo else n * 2, self.rng, opts, sub)
+        batch = n * OVERGENERATE if pseudo else n * 2
 
         accepted, seen = [], set()
         rejected = collections.Counter()
-        for cand in raw:
-            name = _case(cand["name"], case)
-            key = name.lower()
-            if key in seen:
-                continue
-            seen.add(key)
-            core = key.replace(" ", "").replace("-", "")
-            reason = None
-            if min_len and len(core) < min_len or max_len and len(core) > max_len:
-                reason = "length"
-            elif starts and not key.startswith(starts):
-                reason = "prefix"
-            elif key in self.taken:
-                reason = "used in project"
-            elif key in corpus:
-                reason = "real place in a corpus"
-            elif not allow_attractors and (filters.attractor_hit(key) if " " not in key else None):
-                reason = "LLM attractor"
-            elif phonotactics and filters.english_phonotactics(key):
-                reason = "not English-pronounceable"
-            elif max_zipf is not None and filters.real_word(key, max_zipf):
-                reason = "real English word"
-            if reason is None and sound_check:
-                pron, exact, near = filters.sounds_like(name)
-                if exact:
-                    reason = "homophone of a common word"
-                else:
+        raw_total = 0
+        # filters (or --starts-with) can eat most of a batch, so draw more until n are found or a round adds nothing new
+        for _ in range(ROUNDS):
+            raw = engines.run(profile, batch, self.rng, opts, sub)
+            raw_total += len(raw)
+            fresh = 0
+            for cand in raw:
+                name = _case(cand["name"], case)
+                key = name.lower()
+                if key in seen:
+                    continue
+                seen.add(key)
+                fresh += 1
+                reason = reject_reason(cand, name, key)
+                if reason:
+                    rejected[reason] += 1
+                    continue
+                if sound_check:
+                    pron, _, near = filters.sounds_like(name)
                     cand = {**cand, "pron": " ".join(pron)}
                     if near:
                         cand["sounds_like"] = near[:3]
-            if reason:
-                rejected[reason] += 1
-                continue
-            accepted.append({**cand, "name": name})
-            if len(accepted) >= n:
+                cand = {k: v for k, v in cand.items() if k != "reject"}
+                accepted.append({**cand, "name": name})
+                if len(accepted) >= n:
+                    break
+            if len(accepted) >= n or fresh == 0:
                 break
         if top:
-            self.stats = {"profile": profile_name, "engine": engine, "seed": self.seed, "raw": len(raw),
+            self.stats = {"profile": profile_name, "engine": engine, "seed": self.seed, "raw": raw_total,
                           "accepted": len(accepted), "rejected": dict(rejected),
                           "description": profile.get("description", "")}
         return accepted

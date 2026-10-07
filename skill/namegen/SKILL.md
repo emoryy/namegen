@@ -14,7 +14,7 @@ namegen context                      # project naming notes, claimed and avoided
 namegen profiles                     # available profiles
 namegen gen <profile> -n 80          # candidates; the header shows seed and rejection counts
 namegen check <name>...              # pronunciation, sound-alikes, attractor, already used?
-namegen claim <name> --profile <p> --role "<what it names>" --note "<why>"
+namegen claim <name> --profile <p> --role "<what it names>" --note "<why>"   # refuses attractors, rude or sound-alike names without --force
 namegen avoid <name>...              # existing or rejected names, never offered again
 ```
 
@@ -32,7 +32,7 @@ namegen avoid <name>...              # existing or rejected names, never offered
    - a one-letter spelling tweak, if you say so and re-run `check` on the result.
 
    Not allowed: blending two candidates, or "improving" a candidate into a new name.
-5. When the user decides, `claim` it with a role and note. Names the user rejects go to `avoid`.
+5. When the user decides, `claim` it with a role and note. Names the user rejects go to `avoid`. If `claim` refuses a name, tell the user why; pass `--force` only when they still want it. Names that did not come from namegen (existing canon) use `--profile manual`.
 6. Never reuse a seed across requests unless reproducing a list; the default seed is random.
 
 If no profile fits, write a project profile in `<project>/.namegen/profiles/<name>.toml`. It can be:

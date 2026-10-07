@@ -1,5 +1,5 @@
 // Reads one JSON request on stdin, prints a JSON array of raw candidates on stdout.
-//   {"engine": "markov", "words": [...], "n": 300, "seed": 1, "order": 3, "prior": 0.01, "backoff": true, "minLength": 4, "maxLength": 9}
+//   {"engine": "markov", "words": [...], "n": 300, "seed": 1, "order": 3, "prior": 0.01, "backoff": true, "minLength": 4, "maxLength": 9, "startsWith": "tre"}
 //   {"engine": "lexifer", "def": "<.def file text>", "n": 300, "seed": 1}
 import { createRequire } from "node:module";
 import { NameGenerator } from "@ksilvennoinen/markov-namegen";
@@ -22,6 +22,7 @@ function markov(req, random) {
   return gen.generateNames(req.n, {
     minLength: req.minLength ?? 4,
     maxLength: req.maxLength ?? 10,
+    startsWith: req.startsWith ?? "",
     maxTimePerName: 50,
   });
 }
