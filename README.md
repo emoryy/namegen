@@ -366,6 +366,14 @@ max_zipf = 2.5
 
 A `lexifer` profile reads `<profile>.def` next to the `.toml`. See `profiles/` for template and backronym examples.
 
+## Tests
+
+```bash
+uv run pytest
+```
+
+Regression tests for the filters, claim rules and generation options; they run in-process against a temporary project.
+
 ## Rebuilding data
 
 - Corpora: `scripts/build_corpora.py` (download instructions inside).
