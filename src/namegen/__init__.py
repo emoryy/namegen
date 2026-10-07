@@ -137,9 +137,13 @@ def cmd_profiles(args):
 def main():
     ap = argparse.ArgumentParser(prog="namegen", description=__doc__)
     ap.add_argument("--project", help="project root holding .namegen/ (default: git root of cwd)")
+    # also accepted after the subcommand; SUPPRESS keeps a value given before it
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--project", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     sub = ap.add_subparsers(dest="cmd", required=True)
+    add = lambda *a, **k: sub.add_parser(*a, parents=[common], **k)
 
-    g = sub.add_parser("gen", help="generate candidates from a profile")
+    g = add("gen", help="generate candidates from a profile")
     g.add_argument("profile")
     g.add_argument("-n", type=int, default=100)
     g.add_argument("--seed", type=int)
@@ -149,11 +153,11 @@ def main():
     g.add_argument("--json", action="store_true")
     g.set_defaults(func=cmd_gen)
 
-    c = sub.add_parser("check", help="pronunciation, sound-alikes, attractor and usage check for given names")
+    c = add("check", help="pronunciation, sound-alikes, attractor and usage check for given names")
     c.add_argument("names", nargs="+")
     c.set_defaults(func=cmd_check)
 
-    cl = sub.add_parser("claim", help="record a chosen name in the project")
+    cl = add("claim", help="record a chosen name in the project")
     cl.add_argument("name")
     cl.add_argument("--profile", required=True)
     cl.add_argument("--role", required=True, help="what the name is for, e.g. 'gas giant'")
@@ -161,13 +165,13 @@ def main():
     cl.add_argument("--force", action="store_true", help="claim despite attractor, rude or sound-alike warnings")
     cl.set_defaults(func=cmd_claim)
 
-    av = sub.add_parser("avoid", help="add names the project must never be offered (existing or rejected)")
+    av = add("avoid", help="add names the project must never be offered (existing or rejected)")
     av.add_argument("names", nargs="+")
     av.set_defaults(func=cmd_avoid)
 
-    sub.add_parser("used", help="list claimed and avoided names").set_defaults(func=cmd_used)
-    sub.add_parser("context", help="project naming notes plus claimed and avoided names").set_defaults(func=cmd_context)
-    sub.add_parser("profiles", help="list profiles").set_defaults(func=cmd_profiles)
+    add("used", help="list claimed and avoided names").set_defaults(func=cmd_used)
+    add("context", help="project naming notes plus claimed and avoided names").set_defaults(func=cmd_context)
+    add("profiles", help="list profiles").set_defaults(func=cmd_profiles)
 
     args = ap.parse_args()
     try:

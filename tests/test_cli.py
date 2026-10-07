@@ -121,3 +121,28 @@ def test_project_languages_from_config(cli, project):
 def test_claim_refuses_rude_in_other_language(cli):
     code, out = cli("claim", "Getsy", "--profile", "manual", "--role", "x")
     assert code == 1 and "Hungarian 'geci'" in out
+
+
+def test_list_has_no_near_duplicates(cli):
+    from namegen import filters
+    for profile in ["cornish-tin", "soft-harbour", "pit-and-pump"]:
+        got = names(cli("gen", profile, "-n", "40", "--seed", "5")[1])
+        for i, a in enumerate(got):
+            others = filters.project_prons(got[:i] + got[i + 1:])
+            assert not filters.close_to_project(a, others), (profile, a)
+
+
+def test_spread_can_be_disabled(cli, project):
+    prof = project / ".namegen" / "profiles"
+    prof.mkdir(parents=True)
+    (prof / "dense.toml").write_text('engine = "markov"\ncorpus = "cornwall.txt"\n[filters]\nspread = false\n')
+    out = cli("gen", "dense", "-n", "8", "--starts-with", "bra", "--seed", "2")[1]
+    assert "too close" not in header(out)
+
+
+def test_project_option_after_subcommand(project, monkeypatch, capsys):
+    import sys
+    import namegen
+    monkeypatch.setattr(sys, "argv", ["namegen", "avoid", "Hollin", "--project", str(project)])
+    namegen.main()
+    assert (project / ".namegen" / "avoid.txt").exists()

@@ -5,6 +5,7 @@ from . import engines, filters, foreign
 from .profiles import load
 
 PSEUDO = {"markov", "lexifer"}
+COMPOSITE = {"template", "backronym"}
 OVERGENERATE = 8
 ROUNDS = 6
 
@@ -55,6 +56,8 @@ class Generator:
 
         profanity = flt.get("profanity", True)
         project_sound = flt.get("project_sound", True)
+        spread = flt.get("spread", engine not in COMPOSITE)
+        accepted_prons = {}
 
         def reject_reason(cand, name, key):
             core = key.replace(" ", "").replace("-", "")
@@ -82,6 +85,8 @@ class Generator:
                 return "rude in another language"
             if project_sound and self.taken_prons and filters.close_to_project(name, self.taken_prons):
                 return "sounds like a project name"
+            if spread and accepted_prons and filters.close_to_project(name, accepted_prons):
+                return "too close to another candidate"
             return None
 
         sub = lambda name, k: self.generate(name, k, top=False)
@@ -116,6 +121,8 @@ class Generator:
                 if plain:
                     cand["word_in"] = [foreign.language_name(l) for l in plain]
                 accepted.append({**cand, "name": name})
+                if spread:
+                    accepted_prons.update(filters.project_prons([name]))
                 if len(accepted) >= n:
                     break
             if len(accepted) >= n or fresh == 0:
