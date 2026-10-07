@@ -58,15 +58,15 @@ Angoland
 
 $ namegen gen highland -n 8 --seed 2026
 # highland (markov), seed 2026, project ~/worlds/demo
-# 8 candidates from 64 raw; rejected: real English word 4, real place in a corpus 3, not English-pronounceable 2, homophone of a common word 1
+# 8 candidates from 64 raw; rejected: real English word 4, real place in a corpus 3, not English-pronounceable 2, rude in another language 1, homophone of a common word 1
 Litote
-Fass   (sounds like: last, face, fast)
 Keolas
 Geoch   (sounds like: each, reach, beach)
 Ardvasgo
 Ioch   (sounds like: fuck, luck, suck)
 Steinish   (sounds like: stylish)
 Shipoll   (sounds like: nipple, ripple)
+Westfordly
 
 $ namegen gen finnic -n 8 --seed 2026
 # finnic (markov), seed 2026, project ~/worlds/demo
@@ -81,7 +81,7 @@ Hoseva
 Hamaki
 ```
 
-The header says what the filters threw away: real places from the training corpus, real English words, exact homophones of common words, spellings an English reader would stumble on, LLM attractors and rude words. The `sounds like` notes are for the curator: `Ioch` and `Shipoll` pass the filters, but read aloud they are poor picks.
+The header says what the filters threw away: real places from the training corpus, real English words, exact homophones of common words, spellings an English reader would stumble on, LLM attractors and rude words. The project's readers also speak Hungarian (the default), so the highland list loses `Fass`, which sounds like the Hungarian *fasz*. Names that sound almost the same as one already in the list are dropped too (`Misen` next to `Minen` in the soft-harbour list below). The `sounds like` notes are for the curator: `Ioch` and `Shipoll` pass the filters, but read aloud they are poor picks.
 
 ### Invented languages for peoples
 
@@ -90,7 +90,7 @@ Two `lexifer` phonologies for two very different peoples, a gentle trading folk 
 ```console
 $ namegen gen soft-harbour -n 8 --seed 2026
 # soft-harbour (lexifer), seed 2026, project ~/worlds/demo
-# 8 candidates from 64 raw; rejected: real English word 3, length 1
+# 8 candidates from 64 raw; rejected: real English word 3, length 1, too close to another candidate 1
 Monbow
 Selo   (sounds like: self, sell, cell)
 Dasow   (sounds like: das, paso)
@@ -98,7 +98,7 @@ Rilmen
 Samola   (sounds like: samoa)
 Talin   (sounds like: rollin, collin)
 Minen   (sounds like: minute, mission, linen)
-Misen   (sounds like: listen, mission, mason)
+Latilin
 
 $ namegen gen pit-and-pump -n 8 --seed 2026
 # pit-and-pump (lexifer), seed 2026, project ~/worlds/demo
@@ -227,22 +227,22 @@ $ namegen claim Kestrel --profile nonsense --role "a ship"
 unknown profile: nonsense (see `namegen profiles`; use --profile manual for a name that did not come from namegen)
 ```
 
-After the claim, generation drops names too close to `Braddam`. The same seed in an empty project and in this one:
+After the claim, generation drops names too close to `Braddam` (`Braddon`; `Braddoc` is already gone from the empty-project list as too close to `Braddon`). The same seed in an empty project and in this one:
 
 ```console
 $ namegen gen cornish-tin -n 8 --starts-with bra --seed 2     # empty project
-# 8 candidates from 64 raw; rejected: real place in a corpus 2, real English word 1, homophone of a common word 1
-Braddon  Brazion  Bradworgan  Bradston  Braze  Brancott  Braddoc  Bradstock
+# 8 candidates from 64 raw; rejected: real place in a corpus 3, too close to another candidate 2, homophone of a common word 2, real English word 1
+Braddon  Brazion  Bradworgan  Bradston  Braze  Brancott  Bradforder  Bradda
 
 $ namegen gen cornish-tin -n 8 --starts-with bra --seed 2     # after claiming Braddam
-# 8 candidates from 64 raw; rejected: real place in a corpus 3, sounds like a project name 2, homophone of a common word 2, real English word 1
-Brazion  Bradworgan  Bradston  Braze  Brancott  Bradstock  Bradforder  Bradda
+# 8 candidates from 64 raw; rejected: real place in a corpus 3, sounds like a project name 2, homophone of a common word 2, real English word 1, too close to another candidate 1
+Brazion  Bradworgan  Bradston  Braze  Brancott  Bradforder  Bradda  Branwood
 ```
 
 `check` explains any single name:
 
 ```console
-$ namegen check Elara Braddoc Brugast
+$ namegen check Elara Braddoc Brugast Getsy
 Elara
   pronunciation: EH L AA R AH
   homophones: -; one phone away: lara
@@ -250,6 +250,7 @@ Elara
   real word: real word (zipf 1.4)
   LLM attractor: attractor 'elara'
   rude: no
+  other languages (hu): rude: no; plain word in: -
   used/avoided in demo: no
   sounds like a project name: no
 Braddoc
@@ -263,8 +264,14 @@ Brugast
   real word: no
   LLM attractor: no
   rude: no
+  other languages (hu): rude: no; plain word in: -
   used/avoided in demo: no
   sounds like a project name: no
+Getsy
+  pronunciation: G EH T S IY
+  ...
+  other languages (hu): rude: sounds like Hungarian 'geci'; plain word in: -
+  ...
 ```
 
 ### A project profile

@@ -277,5 +277,5 @@ def sounds_like(name):
         near |= near_idx.get(k, set())
     near -= set(exact) | {name.lower()}
     near = {w for w in near if any(_edit1(pron, _strip_stress(p)) for p in _prons(w))}
-    near = sorted(near, key=lambda w: -zipf_frequency(w, "en"))
+    near = sorted(near, key=lambda w: (-zipf_frequency(w, "en"), w))
     return pron, exact, near
